@@ -1,0 +1,7 @@
+Allowed Servers:
+  # It's probably a good idea to call this the same as in your Bungeecord configuration file.
+  name:
+    # Replace with the real IP of your server.
+    ip: 123.123.123.123
+    # Replace with the real port of your server e.g. 25566.
+    port: 12345

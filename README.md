@@ -1,11 +1,24 @@
-DepenizenBungee
----------------
+# DepenizenBungee (forked)
 
-**Depenizen-Bungee: A plugin for Bungee proxy servers to relay messages sent through the Bukkit plugin, Depenizen**
+___
+**Disclaimer: this is NOT the official DepenizenBungee, please see the [official DepenizenBungee](https://github.com/DenizenScript/DepenizenBungee) for the original project.**
 
-- **Depenizen**: https://github.com/DenizenScript/Depenizen
-- **Support Discord**: https://discord.gg/Q6pZGSR
-- **Builds (Download)**: https://ci.citizensnpcs.co/job/DepenizenBungee/
+
+This DepenizenBungee fork changes the 'authentication' system. I made it because I couldn't get DepenizenBungee working on my Pterodactyl (Docker) setup.
+
+This different 'authentication' system relies on a `config.yml` file instead of relying on the BungeeCord config 'authenticate' servers.
+
+### When to use this
+Please only use this if you know what you are doing. Otherwise, just use the official [DepenizenBungee](https://github.com/DenizenScript/DepenizenBungee).
+
+### Example config
+```yaml
+Allowed Servers:
+  # Name of the server (keep this the same as in your Bungeecord config)
+  lobby:
+    ip: 172.18.0.1
+    port: 25566
+```
 
 ### Licensing pre-note:
 

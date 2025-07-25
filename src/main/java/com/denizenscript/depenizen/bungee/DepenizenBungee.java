@@ -5,22 +5,25 @@ import com.denizenscript.depenizen.bungee.packets.out.*;
 import io.netty.channel.Channel;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.md_5.bungee.netty.ChannelWrapper;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -99,6 +102,18 @@ public class DepenizenBungee extends Plugin implements Listener {
                 }
             }
         }, 1, 1, TimeUnit.SECONDS);
+        if (!getDataFolder().exists())
+            getDataFolder().mkdirs();
+        File file = new File(getDataFolder(), "config.yml");
+
+        if (!file.exists()) {
+            try (InputStream in = getResourceAsStream("config.yml")) {
+                Files.copy(in, file.toPath());
+            } catch (IOException e) {
+                getLogger().severe("Failed to create config.");
+                e.printStackTrace();
+            }
+        }
     }
 
     public void broadcastPacket(PacketOut packet) {
@@ -247,15 +262,39 @@ public class DepenizenBungee extends Plugin implements Listener {
         final InetAddress address = handler.getAddress().getAddress();
         if (!address.isLoopbackAddress()) { // Localhost is always allowed
             boolean isValid = false;
-            for (ServerInfo info : getProxy ().getServers().values()) {
-                if (info.getAddress().getAddress().equals(address)) {
-                    isValid = true;
-                    break;
+//            for (ServerInfo info : getProxy ().getServers().values()) {
+//                if (info.getAddress().getAddress().equals(address)) {
+//                    isValid = true;
+//                    break;
+//                }
+//            }
+            Configuration c;
+            try {
+                c = ConfigurationProvider.getProvider(YamlConfiguration.class)
+                        .load(new File(getDataFolder(), "config.yml"));
+            } catch (IOException e) {
+                getLogger().severe("Could not load config.");
+                e.printStackTrace();
+                return;
+            }
+            try {
+                Configuration allowedServers = (Configuration) c.get("Allowed Servers");
+
+                for (String name : allowedServers.getKeys()) {
+                    Configuration server = (Configuration) allowedServers.get(name);
+                    InetAddress ip = InetAddress.getByName(server.getString("ip"));
+                    if (ip.equals(address)) {
+                        isValid = true;
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                getLogger().severe("Couldn't construct address.");
+                e.printStackTrace();
             }
             if (!isValid) {
-                getLogger().warning("INVALID/FAKE Depenizen connection denied from: " + handler.getAddress()
-                        + "... if this was meant to be a real connection, make sure the server address in your Bungee/config.yml matches the IP shown here.");
+                getLogger().warning("Denied invalid or fake Depenizen connection from: " + handler.getAddress() + ".");
+                getLogger().info("If this was meant to be a real connection, ensure the IP and the port are correctly set in the config.");
                 return;
             }
         }
