@@ -6,7 +6,7 @@
     <groupId>com.denizenscript</groupId>
     <artifactId>depenizen-bungee</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <name>DepenizenBungee</name>
     <url>https://github.com/DenizenScript/DepenizenBungee</url>
 
