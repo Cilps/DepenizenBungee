@@ -1,6 +1,5 @@
 # DepenizenBungee (forked)
 
-___
 **Disclaimer: this is NOT the official DepenizenBungee, please see the [official DepenizenBungee](https://github.com/DenizenScript/DepenizenBungee) for the original project.**
 
 
